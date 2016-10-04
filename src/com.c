@@ -17,7 +17,7 @@ void initCOM() {
 
 	out8(START + 1, 0); // disable interruptions
 
-	writeStr("[OK] serial port initialized");
+	writeStr("[OK] serial port initialized\n");
 } 
 
 void writeByte(uint8_t byte) {
@@ -29,22 +29,4 @@ void writeByte(uint8_t byte) {
 void writeStr(char *s) {
 	for (char *c = s; *c; c++) 
 		writeByte(*c);
-}
-
-void writeInt(uint64_t x) {
-	if (x == 0) {
-		writeStr("0");	
-	}
-	char s[50] = {};
-	int sz = 0;
-	for (; x; x /= 10) {
-		s[sz++] = '0' + x % 10;
-	}
-	for (int i = 0; i < sz / 2; ++i) {
-		char tmp = s[i];
-		s[i] = s[sz - i - 1];
-		s[sz - i - 1] = tmp;
-	}
-	s[sz] = 0;
-	writeStr(s);
 }

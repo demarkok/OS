@@ -5,6 +5,7 @@
 #include "ioport.h"
 #include "commonTools.h"
 #include "pit.h"
+#include "printf.h"
 #include <stdint.h>
 
 // extern void (*overHandler) (void);
@@ -27,7 +28,6 @@ static idtEntry idt[IDT_SIZE];
 
 void eoi(uint64_t id) {
 	if (id >= masterFirstIntId && id < masterFirstIntId + 8) {
-		// writeStr("Hello\n");
 		out8(masterCommandPort, 0b00100000);
 	}
 	if (id >= slaveFirstIntId && id < slaveFirstIntId + 8) {
@@ -43,10 +43,7 @@ void handler(uint64_t id) {
 		tick();
 	}
 	else {
-
-		writeStr("[INTERRUPT] #");
-		writeInt(id);
-		writeStr("\n");
+		printf("[INTERRUPT] #%d\n", id);
 	}
 
 	eoi(id);
@@ -55,10 +52,10 @@ void handler(uint64_t id) {
 
 void assert(int expr) {
 	if (!expr) {
-		writeStr("[ERROR] Assertion\n");
+		printf("[ERROR] Assertion\n");
 		while(1);
 	}
-	writeStr("[OK] Assertion\n");
+	printf("[OK] Assertion\n");
 }
 
 

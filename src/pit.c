@@ -4,6 +4,7 @@
 #include "interrupts.h"
 #include "com.h"
 #include "interrupts.h"
+#include "printf.h"
 #include <stdint.h>
 
 #define COMMAND_PORT 0x43
@@ -15,7 +16,7 @@ void tick() {
 	static int cnt = FREQ;
 	--cnt;
 	if (cnt == 0) {
-		writeStr("tick\n");
+		printf("tick\n");
 		cnt = 41;
 	}
 }
