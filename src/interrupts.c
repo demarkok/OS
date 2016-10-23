@@ -8,12 +8,8 @@
 #include "printf.h"
 #include <stdint.h>
 
-// extern void (*overHandler) (void);
-
-// extern uint64_t *overHandler;
 extern uint64_t handlers[];
 
-// extern void* handlers[N];
 
 static desc_table_ptr idtPtr;
 
@@ -47,15 +43,6 @@ void handler(uint64_t id) {
 	}
 
 	eoi(id);
-}
-
-
-void assert(int expr) {
-	if (!expr) {
-		printf("[ERROR] Assertion\n");
-		while(1);
-	}
-	printf("[OK] Assertion\n");
 }
 
 
