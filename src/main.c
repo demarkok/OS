@@ -2,7 +2,9 @@
 #include "interrupts.h"
 #include "pit.h"
 #include "printf.h"
-#include <assert.h>
+#include "memmap.h"
+#include "buddy.h"
+#include "commonTools.h"
 
 
 // extern void (*overHandler) (void);
@@ -36,6 +38,31 @@ void testPrintf() {
 	printf("---TEST---\n\n");
 }
 
+void testBuddy() {
+
+	for (int t = 0; t < 100; t++) {
+		int n = 6;
+		int *arr[1 << 6];
+
+		for (int q = 0; q < (1 << n); q++) {
+			arr[q] = buddyAlloc(2 + n);	
+			for (int i = 0; i < (1 << n); i++) {
+				arr[q][i] = n * q + i;
+			}
+		}
+
+		for (int q = 0; q < (1 << n); q++) {
+			for (int i = 0; i < (1 << n); i++) {
+				assert(arr[q][i] == n * q + i);
+			}
+		}
+		for (int q = 0; q < (1 << n); q++) {
+			buddyFree(arr[q]);
+		}
+	}
+	printf("[OK] buddy tested\n");
+}
+
 
 void main(void)
 {
@@ -45,7 +72,12 @@ void main(void)
 
 	printf("START\n");
 
-	// testPrintf();
+	initMemoryMap();
+	printMemoryMap();
+
+	initBuddy();
+	testBuddy();
+
 
 	initIdt();
 	initPic();
