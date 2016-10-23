@@ -37,7 +37,7 @@ static void writeUnsigned(uint64_t x, int base, void (*write)(char)) {
 	}
 	char s[65] = {};
 	int sz = 0;
-	static const char digits[17] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 
+	static const char digits[17] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 
 								   'a', 'b', 'c', 'd', 'e', 'f'};
 	for (; x; x /= base) {
 		s[sz++] = digits[x % (base)];
