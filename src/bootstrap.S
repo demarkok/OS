@@ -9,6 +9,8 @@
 	.global start32
 	.extern main
 
+	.global toMemMap
+
 
 	.align 16
 start32:
@@ -50,6 +52,12 @@ idt_ptr:
 	.quad 0
 
 	.align 16
+
+toMemMap:
+	.long 
+
+
+
 	.space 0x100
 stack_top:
 
@@ -58,6 +66,10 @@ stack_top:
 	pushl %eax
 	call videomem_clrscr
 	popl %eax
+	
+	movl %ebx, toMemMap
+
+
 	cmpl $0x2badb002, %eax
 	je 1f
 
@@ -135,6 +147,7 @@ setup_mapping:
 	movl $(bootstrap_pml4 - VIRTUAL_BASE), %edi
 	movl $(bootstrap_pml3 - VIRTUAL_BASE + PTE_PRESENT + PTE_WRITE), %eax
 	movl %eax, (%edi)
+	movl %eax, 2048(%edi)
 	movl %eax, 4088(%edi)
 
 	movl %cr4, %eax
