@@ -6,13 +6,11 @@
 
 #define MAX_MAX_RANK 64
 int maxRank = 0;
-Descriptor *descriptors;
-Descriptor *rankHead[MAX_MAX_RANK];
+BuddyDescriptor *descriptors;
+BuddyDescriptor *rankHead[MAX_MAX_RANK];
 
 
 static void *firstPage;
-
-#define PAGE_SIZE 1024
 
 #define LOGICAL_START 0xffff800000000000ll
 #define PHYS(x) ((uint64_t)x - LOGICAL_START)
@@ -40,19 +38,19 @@ void initBuddy() {
 	// printf("%llx\n", PHYS(LOGIC(0x239)));
 
 	while ((uint64_t)PHYS(descriptors) % 4 != 0)
-		descriptors = (Descriptor*)(1 + (uint64_t)descriptors);
+		descriptors = (BuddyDescriptor*)(1 + (uint64_t)descriptors);
 
 
 	while ((uint64_t)PHYS(descriptors) + 
 		   (1ll << maxRank) * PAGE_SIZE + 
-		   2 * (1ll << maxRank) * sizeof(Descriptor) 
+		   2 * (1ll << maxRank) * sizeof(BuddyDescriptor) 
 		   < 
 		   freePlace.addr + freePlace.len)
 		++maxRank;
 
 	--maxRank;
 
-	firstPage = (void*)((uint64_t)descriptors +  2 * (1ll << maxRank) * sizeof(Descriptor));
+	firstPage = (void*)((uint64_t)descriptors +  2 * (1ll << maxRank) * sizeof(BuddyDescriptor));
 
 
 	// printf("maxRank = %d\n", maxRank);
@@ -71,7 +69,7 @@ void initBuddy() {
 	printf("[OK] buddy allocator initialized\n");
 }
 
-void erase(Descriptor *d) {
+void erase(BuddyDescriptor *d) {
 	if (d->prev == NULL)
 		rankHead[d->rank] = d->next;
 
@@ -80,8 +78,8 @@ void erase(Descriptor *d) {
 	if (d->next != NULL)
 		d->next->prev = d->prev;
 }
-void insert(int index, Descriptor *d) {
-	Descriptor *oldHead = rankHead[index];
+void insert(int index, BuddyDescriptor *d) {
+	BuddyDescriptor *oldHead = rankHead[index];
 	rankHead[index] = d;
 	d->prev = NULL;
 	d->next = oldHead;
@@ -90,24 +88,24 @@ void insert(int index, Descriptor *d) {
 }
 
 
-void split(Descriptor *d) {
+void split(BuddyDescriptor *d) {
 	erase(d);
 	d->rank--;
 	insert(d->rank, d);
-	Descriptor *buddy = BUDDY(d);
+	BuddyDescriptor *buddy = BUDDY(d);
 	insert(d->rank, buddy);
 	buddy->rank = d->rank;
 	buddy->free = d->free;
 }
 
-Descriptor* IWant(int rank) {
+BuddyDescriptor* IWant(int rank) {
 	if (rank > maxRank)
 		return NULL;
 	if (rankHead[rank] != NULL) {
 		// printf("ok\n");
 		return rankHead[rank];
 	}
-	Descriptor *parent = IWant(rank + 1);
+	BuddyDescriptor *parent = IWant(rank + 1);
 	if (parent == NULL)
 		return NULL;
 	split(parent);
@@ -117,7 +115,7 @@ Descriptor* IWant(int rank) {
 }
 
 void* buddyAlloc(int rank) {
-	Descriptor *d = IWant(rank);
+	BuddyDescriptor *d = IWant(rank);
 	if (d == NULL) 
 		return NULL;
 
@@ -130,19 +128,19 @@ void* buddyAlloc(int rank) {
 }
 
 
-void mergeWithBuddy(Descriptor *d) {
+void mergeWithBuddy(BuddyDescriptor *d) {
 	
 	if (d->rank >= maxRank)
 		return;
 
-	Descriptor *buddy = BUDDY(d);
+	BuddyDescriptor *buddy = BUDDY(d);
 	if (!buddy->free || buddy->rank != d->rank)
 		return;
 
 	erase(d);
 	erase(buddy);
 
-	Descriptor *parent = INDEX(d) < INDEX(buddy) ? d : buddy;
+	BuddyDescriptor *parent = INDEX(d) < INDEX(buddy) ? d : buddy;
 	parent->rank++;
 	insert(parent->rank, parent);
 	mergeWithBuddy(parent);
@@ -150,7 +148,7 @@ void mergeWithBuddy(Descriptor *d) {
 
 
 void buddyFree(void *addr) {
-	Descriptor *d = DESCR_BY_PAGE((uint64_t)addr);
+	BuddyDescriptor *d = DESCR_BY_PAGE((uint64_t)addr);
 	// printf("free index = %d\n", INDEX(d));
 	d->free = 1;
 	insert(d->rank, d);

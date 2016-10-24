@@ -3,11 +3,13 @@
 
 #include <stdint.h>
 
-typedef struct Descriptor {
+#define PAGE_SIZE 1024
+
+typedef struct BuddyDescriptor {
 	uint8_t rank;
 	uint8_t free;
-	struct Descriptor *prev, *next;
-} __attribute__((packed)) Descriptor;
+	struct BuddyDescriptor *prev, *next;
+} __attribute__((packed)) BuddyDescriptor;
 
 
 void initBuddy();

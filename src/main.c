@@ -5,6 +5,7 @@
 #include "memmap.h"
 #include "buddy.h"
 #include "commonTools.h"
+#include "slab.h"
 
 
 // extern void (*overHandler) (void);
@@ -63,6 +64,31 @@ void testBuddy() {
 	printf("[OK] buddy tested\n");
 }
 
+void testSlab() {
+	for (int t = 0; t < 100; t++) {
+		int n = 50;
+		int *arr[50];
+		SlabAllocator allocator = createSlabAllocator(n * sizeof(int), n);
+		for (int q = 0; q < n; q++) {
+			arr[q] = slabAlloc(&allocator);
+			for (int i = 0; i < n; i++) {
+				arr[q][i] = n * q + i;
+				// printf("%d ", arr[q][i]);
+			}
+			// printf("\n");
+		}
+		for (int q = 0; q < n; q++) {
+			for (int i = 0; i < n; i++) {
+				// printf("%d ", arr[q][i]);
+				assert(arr[q][i] == n * q + i);
+			}
+			// printf("\n");
+			slabFree(&allocator, arr[q]);
+		}
+		destroySlabAllocator(allocator);
+	}
+	printf("[OK] slab tested\n");
+}
 
 void main(void)
 {
@@ -77,6 +103,8 @@ void main(void)
 
 	initBuddy();
 	testBuddy();
+	
+	testSlab();
 
 
 	initIdt();
