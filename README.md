@@ -25,6 +25,6 @@ educational operating system project
         files: buddy.h, buddy.c  
         initialization of buddy allocator
   3. slab  
-        files: slab.h, slab.c
+        files: slab.h, slab.c  
         initialization of slab allocator  
         
