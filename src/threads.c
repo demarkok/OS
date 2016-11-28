@@ -2,6 +2,8 @@
 
 int claim = 0;
 
+// threads manager works with interruptions, so we can just diable interruptions to lock 'mutex'  
+
 void lock() {
 	if (claim == 0) {
 		__asm__ volatile("cli"); // disable interrupts
