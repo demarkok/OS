@@ -12,12 +12,15 @@
 #define INIT_CNT (1193182 / FREQ)
 #define FREQ 41
 
+int secondsCount = 0;
+
 void tick() {
 	static int cnt = FREQ;
 	--cnt;
 	if (cnt == 0) {
 		printf("tick\n");
 		cnt = 41;
+		++secondsCount;
 	}
 }
 

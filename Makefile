@@ -35,7 +35,7 @@ $(C_OBJECTS): %.o: %.c
 
 .PHONY: clean
 clean:
-	rm -f kernel $(OBJ) $(DEP)
+	rm -f kernel $(OBJ) $(DEP) ./src/*.d
 
 run: clean all
 	qemu-system-x86_64 -kernel kernel -serial stdio

@@ -6,6 +6,7 @@
 #include "buddy.h"
 #include "commonTools.h"
 #include "slab.h"
+#include "threads.h"
 
 
 // extern void (*overHandler) (void);
@@ -90,6 +91,16 @@ void testSlab() {
 	printf("[OK] slab tested\n");
 }
 
+// seems that it tests nothing
+void testThreads() {
+	int x = 0;
+	lock();
+	x = 1;
+	unlock();
+	assert(x == 1);
+	printf("[OK] threads tested\n");
+}
+
 void main(void)
 {
 	qemu_gdb_hang();
@@ -106,14 +117,13 @@ void main(void)
 	
 	testSlab();
 
-
 	initIdt();
-	initPic();
-	initPit();
-	
-	__asm__ volatile("int $100");
-	
 
+	initPic();
+	initPit(); // start ticker
+
+	testThreads();
+		
 	printf("done\n");
 	
 	while (1);
