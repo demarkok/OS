@@ -28,3 +28,7 @@ educational operating system project
         files: slab.h, slab.c  
         initialization of slab allocator  
         
+### HOMEWORK3
+  1. lock  
+        files: lock.h, lock.c  
+        elementary lock   
